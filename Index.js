@@ -31,7 +31,8 @@ app.use(
 );
 
 // Handle preflight manually (optional but recommended)
-app.options("*", cors());
+app.options("/*", cors());
+
 
 // Test route
 app.get("/", (req, res) => {
@@ -57,3 +58,4 @@ const startServer = async () => {
 };
 
 startServer();
+
