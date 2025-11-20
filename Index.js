@@ -59,13 +59,13 @@ app.get("/", (req, res) => {
 // Example: /api/user/register, /api/user/login, /api/user/me etc.
 app.use("/api/user", UserRoutes);
 
-// 404 Handler (Agar koi route na mile)
-app.use("*", (req, res) => {
-  res.status(404).json({
-    success: false,
-    message: `Route ${req.originalUrl} not found`,
-  });
-});
+// // 404 Handler (Agar koi route na mile)
+// app.use("*", (req, res) => {
+//   res.status(404).json({
+//     success: false,
+//     message: `Route ${req.originalUrl} not found`,
+//   });
+// });
 
 // Global Error Handler (Optional but recommended)
 app.use((err, req, res, next) => {
@@ -108,3 +108,4 @@ process.on("SIGINT", () => {
 
 // Start the server
 startServer();
+
