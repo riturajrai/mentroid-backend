@@ -19,7 +19,7 @@ app.use(
   cors({
     origin: [
       "http://localhost:3000",
-      "https://mentoroid-frontend.vercel.app/"
+      "https://mentroid-frontend-okd9.vercel.app"
     ],
     credentials: true,
     methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
@@ -89,4 +89,5 @@ const startServer = async () => {
 };
 
 startServer();
+
 
