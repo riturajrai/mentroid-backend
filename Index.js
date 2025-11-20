@@ -1,11 +1,14 @@
-// server.js or app.js
+// =============================
+// server.js / Index.js
+// =============================
+
 const express = require("express");
 const cookieParser = require("cookie-parser");
 const cors = require("cors");
 require("dotenv").config();
 
 const DatabaseConnection = require("./database/config");
-const UserRoutes = require("./Users/routes/routes"); // Yeh tumhara auth routes hoga
+const UserRoutes = require("./Users/routes/routes");
 
 const app = express();
 
@@ -13,10 +16,9 @@ const app = express();
 app.use(express.json({ limit: "10mb" }));
 app.use(express.urlencoded({ extended: true }));
 
-// Cookie parser rakh sakte ho (harmless), future mein use ho sakta hai
 app.use(cookieParser());
 
-// ==================== CORS CONFIG (PERFECT FOR BEARER TOKEN) ====================
+// ==================== CORS CONFIG ====================
 app.use(
   cors({
     origin: [
@@ -24,25 +26,22 @@ app.use(
       "http://localhost:5173",
       "https://mentoroid-frontend.vercel.app",
       "https://mentoroid-app.vercel.app",
-      // Add more origins if needed
     ],
-    credentials: true, // Important if cookies ever used (safe to keep)
+    credentials: true,
     methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
     allowedHeaders: [
       "Content-Type",
-      "Authorization",        // Critical for Bearer Token
+      "Authorization",
       "X-Requested-With",
       "Accept",
       "Origin",
     ],
     exposedHeaders: ["Set-Cookie"],
-    preflightContinue: false,
-    optionsSuccessStatus: 204,
   })
 );
 
-// Optional: Handle preflight requests globally
-app.options("*", cors());
+// Preflight globally
+app.options("/*", cors());
 
 // ==================== TEST ROUTE ====================
 app.get("/", (req, res) => {
@@ -54,20 +53,18 @@ app.get("/", (req, res) => {
   });
 });
 
-// ==================== ROUTES ====================
-// Tumhare saare auth routes yahan load honge
-// Example: /api/user/register, /api/user/login, /api/user/me etc.
+// ==================== USER ROUTES ====================
 app.use("/api/user", UserRoutes);
 
-// // 404 Handler (Agar koi route na mile)
-// app.use("*", (req, res) => {
-//   res.status(404).json({
-//     success: false,
-//     message: `Route ${req.originalUrl} not found`,
-//   });
-// });
+// ==================== 404 ROUTE (SAFE FOR NODE v22) ====================
+app.use((req, res) => {
+  res.status(404).json({
+    success: false,
+    message: `Route ${req.originalUrl} not found`,
+  });
+});
 
-// Global Error Handler (Optional but recommended)
+// ==================== GLOBAL ERROR HANDLER ====================
 app.use((err, req, res, next) => {
   console.error("Unhandled Error:", err);
   res.status(500).json({
@@ -77,7 +74,7 @@ app.use((err, req, res, next) => {
   });
 });
 
-// ==================== START SERVER AFTER DB CONNECT ====================
+// ==================== START SERVER ====================
 const PORT = process.env.PORT || 4000;
 
 const startServer = async () => {
@@ -106,6 +103,4 @@ process.on("SIGINT", () => {
   process.exit(0);
 });
 
-// Start the server
 startServer();
-
