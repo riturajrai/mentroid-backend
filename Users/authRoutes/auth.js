@@ -5,7 +5,7 @@ const jwt = require("jsonwebtoken");
 const transporter = require("../../mails/transporter");
 const User = require("../models/User");
 const Otp = require("../models/Otp");
-const authMiddleware = require("../middleware/authMiddleware");
+const authMiddleware = require("../../middleware/authMiddleware");
 require("dotenv").config();
 
 const router = express.Router();
@@ -344,3 +344,4 @@ router.post("/logout", (req, res) => {
 });
 
 module.exports = router;
+
