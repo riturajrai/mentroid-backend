@@ -30,8 +30,7 @@ app.use(
   })
 );
 
-// Handle preflight manually (optional but recommended)
-app.options("/*", cors());
+
 
 
 // Test route
@@ -58,4 +57,5 @@ const startServer = async () => {
 };
 
 startServer();
+
 
