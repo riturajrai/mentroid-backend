@@ -1,7 +1,3 @@
-// =============================
-// server.js / Index.js
-// =============================
-
 const express = require("express");
 const cookieParser = require("cookie-parser");
 const cors = require("cors");
@@ -18,7 +14,7 @@ app.use(express.urlencoded({ extended: true }));
 
 app.use(cookieParser());
 
-// ==================== CORS CONFIG ====================
+// ==================== CORS CONFIG — NO WILDCARDS ====================
 app.use(
   cors({
     origin: [
@@ -40,23 +36,27 @@ app.use(
   })
 );
 
-// Preflight globally
-app.options("/*", cors());
+// ❌ REMOVE THIS (it breaks):
+// app.options("/*", cors());
 
-// ==================== TEST ROUTE ====================
+// ❌ REMOVE THIS TOO:
+// app.options("*", cors());
+
+// No wildcard at all → Node v22 safe
+
+// ==================== DEFAULT ROUTE ====================
 app.get("/", (req, res) => {
   res.status(200).json({
     success: true,
     message: "Mentoroid Auth Service is Running!",
     timestamp: new Date().toISOString(),
-    service: "Auth API",
   });
 });
 
-// ==================== USER ROUTES ====================
+// ==================== ROUTES ====================
 app.use("/api/user", UserRoutes);
 
-// ==================== 404 ROUTE (SAFE FOR NODE v22) ====================
+// ==================== 404 (NO WILDCARD) ====================
 app.use((req, res) => {
   res.status(404).json({
     success: false,
@@ -64,13 +64,12 @@ app.use((req, res) => {
   });
 });
 
-// ==================== GLOBAL ERROR HANDLER ====================
+// ==================== ERROR HANDLER ====================
 app.use((err, req, res, next) => {
   console.error("Unhandled Error:", err);
   res.status(500).json({
     success: false,
     message: "Internal Server Error",
-    error: process.env.NODE_ENV === "development" ? err.message : undefined,
   });
 });
 
@@ -83,24 +82,12 @@ const startServer = async () => {
     console.log("MongoDB Connected Successfully!");
 
     app.listen(PORT, () => {
-      console.log(`Auth Service running on http://localhost:${PORT}`);
-      console.log(`API Base URL: http://localhost:${PORT}/api/user`);
+      console.log(`Auth Service running on port ${PORT}`);
     });
   } catch (error) {
-    console.error("Failed to connect to MongoDB:", error.message);
+    console.error("MongoDB Connection Failed:", error);
     process.exit(1);
   }
 };
-
-// Graceful shutdown
-process.on("SIGTERM", () => {
-  console.log("SIGTERM received. Shutting down gracefully...");
-  process.exit(0);
-});
-
-process.on("SIGINT", () => {
-  console.log("SIGINT received. Shutting down...");
-  process.exit(0);
-});
 
 startServer();
