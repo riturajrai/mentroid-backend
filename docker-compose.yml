@@ -1,0 +1,52 @@
+version: "3.8"
+services:
+  mongo:
+    image: mongo:6
+    container_name: mongo
+    restart: unless-stopped
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo-data:/data/db
+
+  auth-service:
+    build: ./auth-service
+    container_name: auth-service
+    environment:
+      - PORT=4000
+      - MONGO_URI=mongodb://mongo:27017/microdb
+      - JWT_SECRET=supersecret_jwt_key
+      - JWT_EXPIRES_IN=900s
+      - REFRESH_TOKEN_EXPIRES_IN=7d
+    depends_on:
+      - mongo
+    ports:
+      - "4000:4000"
+
+  user-service:
+    build: ./user-service
+    container_name: user-service
+    environment:
+      - PORT=4100
+      - MONGO_URI=mongodb://mongo:27017/microdb
+    depends_on:
+      - mongo
+    ports:
+      - "4100:4100"
+
+  api-gateway:
+    build: ./api-gateway
+    container_name: api-gateway
+    environment:
+      - PORT=3000
+      - AUTH_SERVICE_URL=http://auth-service:4000
+      - USER_SERVICE_URL=http://user-service:4100
+      - JWT_SECRET=supersecret_jwt_key
+    depends_on:
+      - auth-service
+      - user-service
+    ports:
+      - "3000:3000"
+
+volumes:
+  mongo-data:
